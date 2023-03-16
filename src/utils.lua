@@ -498,7 +498,7 @@ function utils.dumpTable(o)
     end
 end
 
-function printd(...)
+function utils.printd(...)
     local args = { ... }
     if os.getenv("OLYMPUS_DEBUG") == '1' then
         print(args)
