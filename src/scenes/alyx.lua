@@ -218,7 +218,7 @@ function scene.reloadInstalls(scene, cb)
 			{ index = i, entry = entry, version = "???" }
 		)
 
-		sharp.getVersionString(entry.path):calls(function(t, version)
+		sharp.getVersionString(entry.assetsPath):calls(function(t, version)
 			version = version or "???"
 
 			local crosscode, ccloader

@@ -18,7 +18,7 @@ public unsafe class CmdLaunch : Cmd<string, string, bool, string?> {
 
 		if (Environment.OSVersion.Platform == PlatformID.Unix) {
 			game.StartInfo.FileName = Path.Combine(root, "CrossCode");
-			if (!File.Exists(game.StartInfo.FileName) && Path.GetFileName(root) == "Resources")
+			if (!File.Exists(game.StartInfo.FileName) && Path.GetFileName(root) == "MacOS")
 				game.StartInfo.FileName = Path.Combine(Path.GetDirectoryName(root)!, "MacOS", "nwjs");
 		} else
 			game.StartInfo.FileName = Path.Combine(root, "CrossCode.exe");

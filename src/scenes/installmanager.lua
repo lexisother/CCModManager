@@ -53,15 +53,20 @@ function scene.browse()
 
         local path = fs.openDialog(type):result()
         if not path then
+            utils.printd('[debug:browse] No path selected? Returning.')
             return
         end
+        utils.printd('[debug:browse] Path selected: ', fs.dirname(path))
 
         path = require("finder").fixRoot(fs.dirname(path))
+        utils.printd('[debug:browse] Attempting to fixRoot, result is: ', path)
         if not path then
+            utils.printd('[debug:browse] Failed to fixRoot... Returning.')
             return
         end
 
         local foundT = threader.wrap("finder").findAll()
+        utils.printd('[debug:browse] Ran findAll, result: ', utils.dumpTable(foundT))
 
         local installs = config.installs
         for i = 1, #installs do
@@ -72,10 +77,16 @@ function scene.browse()
 
         local entry = {
             type = "manual",
-            path = path
+            path = path,
+            assetsPath = path
         }
 
+        if userOS == "OS X" then
+            entry.assetsPath = fs.dirname(path, "../Resources/app.nw")
+        end
+
         local found = foundT:result()
+        utils.printd('[debug:browse] Result of foundT: ', utils.dumpTable(found))
         for i = 1, #found do
             if found[i].path == path then
                 entry = found[i]
@@ -94,7 +105,7 @@ end
 
 function scene.createEntry(list, entry, manualIndex)
     local labelVersion = uie.label({{1, 1, 1, 0.5}, "Scanning..."})
-    sharp.getVersionString(entry.path):calls(function(t, version)
+    sharp.getVersionString(entry.assetsPath):calls(function(t, version)
         labelVersion.text = {{1, 1, 1, 0.5}, version or "???"}
     end)
 

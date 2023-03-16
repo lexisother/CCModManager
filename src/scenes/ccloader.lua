@@ -215,7 +215,7 @@ function scene.install()
 		end
 
 		installer
-			.sharpTask("installCCLoader", install.entry.path, url, string.sub(version.sha, 1, 7))
+			.sharpTask("installCCLoader", install.entry.assetsPath, url, string.sub(version.sha, 1, 7))
 			:calls(function(task, last)
 				if not last then
 					return
@@ -258,7 +258,7 @@ function scene.uninstall()
 	local installer = scener.push("installer")
 	installer.update("Preparing uninstallation of CCLoader", false, "backup")
 
-	installer.sharpTask("uninstallCCLoader", install.entry.path):calls(function(task, last)
+	installer.sharpTask("uninstallCCLoader", install.entry.assetsPath):calls(function(task, last)
 		if not last then
 			return
 		end

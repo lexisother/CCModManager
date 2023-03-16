@@ -498,17 +498,24 @@ function utils.dumpTable(o)
     end
 end
 
+function printd(...)
+    local args = { ... }
+    if os.getenv("OLYMPUS_DEBUG") == '1' then
+        print(args)
+    end
+end
+
 -- And below, the StackOverflow section.
 
 -- https://stackoverflow.com/a/43582076 {{{
 -- gsplit: iterate over substrings in a string separated by a pattern
--- 
+--
 -- Parameters:
 -- text (string)    - the string to iterate over
 -- pattern (string) - the separator pattern
 -- plain (boolean)  - if true (or truthy), pattern is interpreted as a plain
 --                    string, not a Lua pattern
--- 
+--
 -- Returns: iterator
 --
 -- Usage:
@@ -542,13 +549,13 @@ function utils.gsplit(text, pattern, plain)
 end
 
 -- split: split a string into substrings separated by a pattern.
--- 
+--
 -- Parameters:
 -- text (string)    - the string to iterate over
 -- pattern (string) - the separator pattern
 -- plain (boolean)  - if true (or truthy), pattern is interpreted as a plain
 --                    string, not a Lua pattern
--- 
+--
 -- Returns: table (a sequence table containing the substrings)
 function utils.split(text, pattern, plain)
   local ret = {}

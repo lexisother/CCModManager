@@ -395,6 +395,7 @@ function finder.findItchInstalls(name)
 
     for body in query:urows() do
         local data = utils.fromJSON(body)
+        print(utils.dumpTable(data))
         local path = data.basePath
         if fs.isDirectory(path) then
             print("[finder]", "itch install", path)
@@ -564,33 +565,45 @@ end
 
 
 function finder.fixRoot(root, appname)
+    utils.printd('[debug:fixRoot] running fixRoot using root ', root)
     if not root or #root == 0 then
         return nil
     end
 
     appname = appname or finder.defaultName
+    exename = appname
+    local userOS = love.system.getOS()
+    if userOS == "OS X" then
+        utils.printd('[debug:fixRoot] MacOS found! Forcing exename to "nwjs"...')
+        exename = "nwjs"
+    end
+    utils.printd('[debug:fixRoot] Using appname ', appname)
+    utils.printd('[debug:fixRoot] Using exename ', exename)
 
     root = fs.normalize(root)
+    utils.printd('[debug:fixRoot] Running fs.normalize on root, result: ', root)
     -- If dealing with a macOS root, get the root's root to get the new real root.
     root = (
         root:match([=[^(.*)[\/]]=] .. appname .. [=[%.app[\/]Contents[\/]Resources[\/]?$]=]) or
         root:match([=[^(.*)[\/]]=] .. appname .. [=[%.app[\/]Contents[\/]MacOS[\/]?$]=]) or
         root
     )
+    utils.printd('[debug:fixRoot] Ran regex fuckery, result root: ', root)
 
     local dirs = {
         root,
         fs.joinpath(root, appname .. ".app", "Contents", "Resources"), -- 1.3.3.0 and newer
         fs.joinpath(root, appname .. ".app", "Contents", "MacOS"), -- pre 1.3.3.0
     }
+    utils.printd('[debug:fixRoot] Constructed dirs table, result: ', utils.dumpTable(dirs))
 
     for i = 1, #dirs do
         local path = dirs[i]
-        if fs.isFile(fs.joinpath(path, appname)) or fs.isFile(fs.joinpath(path, appname .. '.exe')) then
-            print("[finder]", "found " .. appname .. " root", path)
+        if fs.isFile(fs.joinpath(path, exename)) or fs.isFile(fs.joinpath(path, exename .. '.exe')) then
+            print("[finder]", "found " .. exename .. " root", path)
             return path
-        elseif fs.isFile(fs.joinpath(path, appname .. '.exe')) then
-            print("[finder]", "found " .. appname .. ".exe root", path)
+        elseif fs.isFile(fs.joinpath(path, exename .. '.exe')) then
+            print("[finder]", "found " .. exename .. ".exe root", path)
             return path
         end
     end
@@ -621,6 +634,10 @@ function finder.fixRoots(all, keepStale, keepDupe, appname)
             end
         else
             all[i].path = pathA
+            all[i].assetsPath = pathA
+            if love.system.getOS() == "OS X" then
+                all[i].assetsPath = fs.joinpath(pathA, "..", "Resources", "app.nw")
+            end
             if not keepDupe then
                 local j = i + 1
                 while j <= #all do
@@ -654,6 +671,8 @@ function finder.findAll(uncached)
     )
 
     finder.fixRoots(all)
+
+    utils.printd('[debug:findAll] all:', utils.dumpTable(all))
 
     channelSet(channelCache, all)
     return all
