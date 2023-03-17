@@ -41,15 +41,24 @@ public unsafe partial class CmdInstallCCLoader : Cmd<string, string, string, IEn
 			Directory.CreateDirectory(PathOrig);
 		}
 
-		// if (is3 && Directory.Exists(Path.Combine(root, "ccloader")))
+		if (is3 && File.Exists(Path.Combine(root, "ccloader", "package.json")))
+		{
+				yield return Status($"CCLoader2 found!", false, "backup", false);
+				var from = Path.Combine(root, "assets", "mods");
+				var to = Path.Combine(PathOrig, "ccloader2", Path.GetFileName(from));
+				if (!Directory.Exists(from))
+				{
+					yield return Status("Somehow, CCLoader is installed, but the mods directory is not present.", 1f, "error", false);
+					throw new Exception("CCLoader found, but no mods dir exists!");
+				}
+
+				yield return Status($"Moving mods directory {from} => {to}", false, "backup", false);
+				Directory.Move(from, to);
+		}
+		
+		// if (!is3 && File.Exists(Path.Combine(root, "ccloader", "metadata.json")))
 		// {
-		// 	yield return Status("CCLoader2 was found! Moving its files into the backup directory...", false, "backup", false);
-		// 	var toMove = new[] { "mods.json", "package.json" };
-		// }
-		//
-		// if (!is3 && Directory.Exists(Path.Combine(root, "ccloader3")))
-		// {
-		// 	yield return Status("CCLoader3 was found! Please uninstall it before installing CCLoader2.", false, "backup", false);
+		// 	yield return Status("CCLoader3 was found!", false, "backup", false);
 		// }
 
 			
@@ -57,7 +66,7 @@ public unsafe partial class CmdInstallCCLoader : Cmd<string, string, string, IEn
 		for (var i = 0; i < toBackup.Length; i++)
 		{
 			yield return Status($"Backing up {toBackup.Length} files", 0f, "backup", false);
-			var from = Path.Combine(root,     "package.json");
+			var from = Path.Combine(root, toBackup[i]);
 			var to   = Path.Combine(PathOrig, Path.GetFileName(from));
 			if (!File.Exists(from) || File.Exists(to)) continue;
 
