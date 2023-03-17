@@ -2,6 +2,7 @@
 using System.Collections;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 
 namespace CCModManager;
 
@@ -11,6 +12,7 @@ public unsafe partial class CmdInstallCCLoader : Cmd<string, string, string, IEn
 	public override IEnumerator Run(string root, string artifactBase, string sha)
 	{
 		var PathOrig = Path.Combine(root, "orig");
+		var is3 = artifactBase.Contains("CCLoader3");
 
 		// if (artifactBase.StartsWith("file://")) {
 		// artifactBase = artifactBase.Substring("file://".Length);
@@ -29,14 +31,27 @@ public unsafe partial class CmdInstallCCLoader : Cmd<string, string, string, IEn
 		// }
 
 		Console.Error.WriteLine($"Root to install to: {root}");
-		Console.Error.WriteLine($"File we're downloading: ${artifactBase}");
-		Console.Error.WriteLine($"We are installing CCLoader 3: ${artifactBase.Contains("CCLoader3")}");
+		Console.Error.WriteLine($"File we're downloading: {artifactBase}");
+		Console.Error.WriteLine($"We are installing CCLoader 3: {artifactBase.Contains("CCLoader3")}");
+		Console.Error.WriteLine($"SHA that is used in the prefix of the Unpack function: {sha}");
 
 		if (!Directory.Exists(PathOrig))
 		{
 			yield return Status("Creating backup orig directory", false, "backup", false);
 			Directory.CreateDirectory(PathOrig);
 		}
+
+		// if (is3 && Directory.Exists(Path.Combine(root, "ccloader")))
+		// {
+		// 	yield return Status("CCLoader2 was found! Moving its files into the backup directory...", false, "backup", false);
+		// 	var toMove = new[] { "mods.json", "package.json" };
+		// }
+		//
+		// if (!is3 && Directory.Exists(Path.Combine(root, "ccloader3")))
+		// {
+		// 	yield return Status("CCLoader3 was found! Please uninstall it before installing CCLoader2.", false, "backup", false);
+		// }
+
 			
 		var toBackup = new[] { "package.json" };
 		for (var i = 0; i < toBackup.Length; i++)
@@ -50,15 +65,20 @@ public unsafe partial class CmdInstallCCLoader : Cmd<string, string, string, IEn
 			File.Copy(from, to);
 		}
 
-		yield return Status("Downloading CCLoader", false, "download", false);
+		var loaderName = is3 ? "CCLoader3" : "CCLoader";
+
+		yield return Status($"Downloading {loaderName}", false, "download", false);
 
 		using var zipStream = new MemoryStream();
 		yield return Download(artifactBase, 0, zipStream);
 
-		yield return Status("Unzipping CCLoader", false, "download", false);
+		yield return Status($"Unzipping {loaderName}", false, "download", false);
 		zipStream.Seek(0, SeekOrigin.Begin);
 		using var zip = new ZipArchive(zipStream, ZipArchiveMode.Read);
 		yield return Status(zip.ToString()!, false, "download", false);
-		yield return Unpack(zip, root, $"CCDirectLink-CCLoader-{sha}/");
+		if (is3)
+			yield return Unpack(zip, root);
+		else
+			yield return Unpack(zip, root, $"CCDirectLink-{loaderName}-{sha}/");
 	}
 }
