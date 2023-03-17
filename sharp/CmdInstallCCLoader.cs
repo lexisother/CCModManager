@@ -10,6 +10,7 @@ public class CmdInstallCCLoader : Cmd<string, string, string, IEnumerator>
     public override IEnumerator Run(string root, string artifactBase, string sha)
     {
         var PathOrig = Path.Combine(root, "orig");
+        var PathMods = Path.Combine(root, "assets", "mods");
         var is3 = artifactBase.Contains("CCLoader3");
 
         // if (artifactBase.StartsWith("file://")) {
@@ -50,17 +51,44 @@ public class CmdInstallCCLoader : Cmd<string, string, string, IEnumerator>
         if (is3 && File.Exists(Path.Combine(root, "ccloader", "package.json")))
         {
             yield return Status("CCLoader2 found!", false, "backup", false);
-            var from = Path.Combine(root, "assets", "mods");
             var to = Path.Combine(PathOrig, "ccloader2-mods");
-            if (!Directory.Exists(from))
+            if (!Directory.Exists(PathMods))
             {
                 yield return Status("Somehow, CCLoader2 is installed, but the mods directory is not present.", 1f,
                     "error", false);
                 throw new Exception("CCLoader2 found, but no mods dir exists!");
             }
 
-            yield return Status($"Moving mods directory {from} => {to}", false, "backup", false);
-            Directory.Move(from, to);
+            // Initialize our backup directory...
+            Directory.CreateDirectory(Path.Combine(PathOrig, "ccloader3-mods"));
+
+            var folders = Directory.GetDirectories(PathMods);
+            var files = Directory.GetFiles(PathMods);
+            // Folder mods...
+            for (var i = 0; i < folders.Length; i++)
+            {
+                var dir = folders[i];
+                yield return Status($"Backing up {folders.Length} folder mods", 0f, "backup", false);
+                if (dir != "simplify" || dir != "ccloader-version-display")
+                    yield return Status($"Backing up {Path.Combine(PathMods, dir)} => {Path.Combine(to, dir)}",
+                        i / (float)folders.Length,
+                        "backup", true);
+                Directory.Move(Path.Combine(PathMods, dir), Path.Combine(to, dir));
+            }
+
+            // CCMods...
+            for (var i = 0; i < files.Length; i++)
+            {
+                var file = files[i];
+                yield return Status($"Backing up {files.Length} CCMods", 0f, "backup", false);
+                yield return Status($"Backing up {Path.Combine(PathMods, file)} => {Path.Combine(to, file)}",
+                    i / (float)files.Length,
+                    "backup", true);
+                File.Move(Path.Combine(PathMods, file), Path.Combine(to, file));
+            }
+
+            yield return Status("Deleting leftover mods directory", false, "backup", false);
+            Directory.Delete(PathMods);
 
             yield return Status("Removing CCLoader2", false, "backup", false);
             Directory.Delete(Path.Combine(root, "ccloader"), true);
@@ -69,17 +97,43 @@ public class CmdInstallCCLoader : Cmd<string, string, string, IEnumerator>
         if (!is3 && File.Exists(Path.Combine(root, "ccloader", "metadata.json")))
         {
             yield return Status("CCLoader3 was found!", false, "backup", false);
-            var from = Path.Combine(root, "assets", "mods");
             var to = Path.Combine(PathOrig, "ccloader3-mods");
-            if (!Directory.Exists(from))
+            if (!Directory.Exists(PathMods))
             {
                 yield return Status("Somehow, CCLoader3 is installed, but the mods directory is not present.", 1f,
                     "error", false);
                 throw new Exception("CCLoader3 found, but no mods dir exists!");
             }
 
-            yield return Status($"Moving mods directory {from} => {to}", false, "backup", false);
-            Directory.Move(from, to);
+            // Initialize our backup directory...
+            Directory.CreateDirectory(Path.Combine(PathOrig, "ccloader2-mods"));
+
+            var folders = Directory.GetDirectories(PathMods);
+            var files = Directory.GetFiles(PathMods);
+            // Folder mods...
+            for (var i = 0; i < folders.Length; i++)
+            {
+                var dir = folders[i];
+                yield return Status($"Backing up {folders.Length} folder mods", 0f, "backup", false);
+                yield return Status($"Backing up {Path.Combine(PathMods, dir)} => {Path.Combine(to, dir)}",
+                    i / (float)folders.Length,
+                    "backup", true);
+                Directory.Move(Path.Combine(PathMods, dir), Path.Combine(to, dir));
+            }
+
+            // CCMods...
+            for (var i = 0; i < files.Length; i++)
+            {
+                var file = files[i];
+                yield return Status($"Backing up {files.Length} CCMods", 0f, "backup", false);
+                yield return Status($"Backing up {Path.Combine(PathMods, file)} => {Path.Combine(to, file)}",
+                    i / (float)files.Length,
+                    "backup", true);
+                File.Move(Path.Combine(PathMods, file), Path.Combine(to, file));
+            }
+
+            yield return Status("Deleting leftover mods directory", false, "backup", false);
+            Directory.Delete(PathMods);
 
             yield return Status("Removing CCLoader3", false, "backup", false);
             Directory.Delete(Path.Combine(root, "ccloader"), true);
@@ -117,6 +171,28 @@ public class CmdInstallCCLoader : Cmd<string, string, string, IEnumerator>
         else
         {
             yield return Unpack(zip, root, $"CCDirectLink-{loaderName}-{sha}/");
+        }
+
+        if (is3 && Directory.Exists(Path.Combine(PathOrig, "ccloader3-mods")))
+        {
+            foreach (var dir in Directory.GetDirectories(Path.Combine(PathOrig, "ccloader3-mods")))
+            {
+            }
+
+            foreach (var file in Directory.GetFiles(Path.Combine(PathOrig, "ccloader3-mods")))
+            {
+            }
+        }
+
+        if (!is3 && Directory.Exists(Path.Combine(PathOrig, "ccloader2-mods")))
+        {
+            foreach (var dir in Directory.GetDirectories(Path.Combine(PathOrig, "ccloader2-mods")))
+            {
+            }
+
+            foreach (var file in Directory.GetFiles(Path.Combine(PathOrig, "ccloader2-mods")))
+            {
+            }
         }
     }
 }
