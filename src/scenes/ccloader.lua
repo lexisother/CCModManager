@@ -395,6 +395,11 @@ function scene.load()
 		for ri = 1, #releases do
 			local release = releases[ri]
 			local version = utils.split(release.tag_name, "/", true)[1]
+			if version:find("stable") then
+				state = "stable"
+			elseif version:find("beta") then
+				state = "beta"
+			end
 
 			for _, tag in ipairs(tags) do
 				if release.tag_name == tag.name then
@@ -421,7 +426,9 @@ function scene.load()
 
 			::readd::
 
-			local item = uie.listItem(text, release):with(uiu.fillWidth)
+			local item = uie[state == "stable" and "listItemGreen"
+					or state == "beta" and "listItemYellow"
+					or "listItem"](text, release):with(uiu.fillWidth)
 			item.label.wrap = true
 
 			local index = nil
