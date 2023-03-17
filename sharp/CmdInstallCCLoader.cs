@@ -76,9 +76,10 @@ public unsafe partial class CmdInstallCCLoader : Cmd<string, string, string, IEn
 		zipStream.Seek(0, SeekOrigin.Begin);
 		using var zip = new ZipArchive(zipStream, ZipArchiveMode.Read);
 		yield return Status(zip.ToString()!, false, "download", false);
-		if (is3)
+		if (is3) {
 			yield return Unpack(zip, root);
-		else
+			Directory.CreateDirectory(Path.Combine(root, "assets", "mods"));
+		} else
 			yield return Unpack(zip, root, $"CCDirectLink-{loaderName}-{sha}/");
 	}
 }
