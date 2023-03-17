@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 shopt -s extglob
+set -x
 
 # Set some common environment variables
 PWSH="pwsh -NoLogo -NoProfile -NonInteractive -Command"
@@ -26,7 +27,7 @@ mkdir -p love-raw && \
   cp -rv love-raw love
 
 ${PWSH} "
-  Compress-Archive -Path src/* -DestinationPath ccmodmanager.zip -Force && 
+  Compress-Archive -Path src/* -DestinationPath ccmodmanager.zip -Force &&
   Move-Item -Path ccmodmanager.zip -Destination ccmodmanager.love &&
   Copy-Item -Path ccmodmanager.love -Destination love/${loveBinaryDirectory}/ccmodmanager.love
 "
@@ -34,15 +35,15 @@ ${PWSH} "
 luarocks install --tree=.luarocks https://raw.githubusercontent.com/0x0ade/lua-subprocess/master/subprocess-scm-1.rockspec "${luarocksArgs}" && \
   luarocks install --tree=.luarocks https://raw.githubusercontent.com/Vexatos/nativefiledialog/master/lua/nfd-scm-1.rockspec "${luarocksArgs}" && \
   luarocks install --tree=.luarocks lsqlite3complete "${luarocksArgs}"
-cp -rv .luarocks/lib/lua/**/* love/"${loveBinaryDirectory}" && \
-cp -r .luarocks/share/lua/**/* love
-cp -rv lib-${agentArch}/* love/"${loveBinaryDirectory}" && \
-cp -rv sharp/bin/**/net6/!(xunit.*|System.*|Microsoft.*|*.Tests.dll|*.pdb) love/"${loveBinaryDirectory}"/sharp
-mv love/"${loveBinaryDirectory}"/sharp/"${SHARP_NAME}" love/"${loveBinaryDirectory}"/sharp/"${SHARP_NAME}"
-rm -rf love/"${loveBinaryDirectory}"/sharp/net*
-cp -rv sharp/bin/**/net*/* love/"${loveBinaryDirectory}"/sharp
+cp -rvf .luarocks/lib/lua/**/* love/"${loveBinaryDirectory}" && \
+cp -rvf .luarocks/share/lua/**/* love
+cp -rvf lib-${agentArch}/* love/"${loveBinaryDirectory}" && \
+cp -rvf sharp/bin/**/net6/!(xunit.*|System.*|Microsoft.*|*.Tests.dll|*.pdb) love/"${loveBinaryDirectory}"/sharp
+mv -v love/"${loveBinaryDirectory}"/sharp/"${SHARP_NAME}" love/"${loveBinaryDirectory}"/sharp/"${SHARP_NAME}"
+rm -rvf love/"${loveBinaryDirectory}"/sharp/net*
+cp -rvf sharp/bin/**/net*/* love/"${loveBinaryDirectory}"/sharp
 
-cp -rv lib-mono/* love/"${loveBinaryDirectory}"/sharp
+cp -rvf lib-mono/* love/"${loveBinaryDirectory}"/sharp
 
 mkdir ../a
 
@@ -67,4 +68,4 @@ cp -v ccmodmanager.sh love/"${loveBinaryDirectory}"/ccmodmanager && \
 rm -rf luarocks love love-raw love.tar.gz ccmodmanager.zip ccmodmanager.love
 mkdir /web
 mv dist.zip /web
-PORT=8080 FOLDER=/web /serve 
+PORT=8080 FOLDER=/web /serve
