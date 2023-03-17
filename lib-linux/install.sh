@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Olympus install script bundled with Linux builds.
+# CCModManager install script bundled with Linux builds.
 
 SRCDIR="$(dirname "$(realpath "$0")")"
 cd "$SRCDIR" || exit 1
 
-echo "Olympus exists at $SRCDIR"
+echo "CCModManager exists at $SRCDIR"
 echo "For a full installation experience, this script will set up the following:"
 
 DESKTOPSRCFILE="$SRCDIR/ccmodmanager.desktop"
@@ -17,23 +17,23 @@ if [ "$EUID" -ne 0 ]; then
     else
         APPSDIR="$HOME/.local/share/applications"
     fi
-    DESKTOPFILE="$APPSDIR/Olympus.desktop"
+    DESKTOPFILE="$APPSDIR/CCModManager.desktop"
     echo "- A desktop file will be created at $DESKTOPFILE"
-    echo "- The everest scheme handler will be registered for your user"
+    echo "- The CCLoader scheme handler will be registered for your user"
     echo
-    echo "If you want to install Olympus system-wide, it is recommended to copy Olympus to /opt/olympus/, fix permissions and run install.sh as root."
+    echo "If you want to install CCModManager system-wide, it is recommended to copy CCModManager to /opt/ccmodmanager/, fix permissions and run install.sh as root."
 
 else
     APPSDIR="/usr/share/applications"
-    DESKTOPFILE="/usr/share/applications/Olympus.desktop"
-    BINFILE="/usr/bin/olympus"
-    ICONFILE="/usr/share/icons/hicolor/128x128/apps/olympus.png"
-    echo "- olympus.desktop will be copied to $DESKTOPFILE"
-    echo "- A symlink to olympus.sh will be created at $BINFILE"
-    echo "- olympus.png will be copied to $ICONFILE"
-    echo "- The everest scheme handler will be registered for everyone"
+    DESKTOPFILE="/usr/share/applications/CCModManager.desktop"
+    BINFILE="/usr/bin/ccmodmanager"
+    ICONFILE="/usr/share/icons/hicolor/128x128/apps/ccmodmanager.png"
+    echo "- CCModManager.desktop will be copied to $DESKTOPFILE"
+    echo "- A symlink to ccmodmanager.sh will be created at $BINFILE"
+    echo "- ccmodmanager.png will be copied to $ICONFILE"
+    echo "- The CCModManager scheme handler will be registered for everyone"
     echo
-    echo "Olympus will be installed system-wide. Please make sure that permissions are set up properly."
+    echo "CCModManager will be installed system-wide. Please make sure that permissions are set up properly."
 fi
 
 echo
@@ -51,8 +51,8 @@ if [ "$EUID" -ne 0 ]; then
     mkdir -p "$(dirname "$DESKTOPFILE")"
     rm -f "$DESKTOPFILE"
     cat "$DESKTOPSRCFILE" \
-    | sed "s/Exec=olympus/Exec=\"$(echo "$BINSRCFILE" | sed 's_/_\\/_g')\"/" \
-    | sed "s/Icon=olympus/Icon=$(echo "$ICONSRCFILE" | sed 's_/_\\/_g')/" \
+    | sed "s/Exec=ccmodmanager/Exec=\"$(echo "$BINSRCFILE" | sed 's_/_\\/_g')\"/" \
+    | sed "s/Icon=ccmodmanager/Icon=$(echo "$ICONSRCFILE" | sed 's_/_\\/_g')/" \
     > "$DESKTOPFILE"
 
 else
@@ -75,8 +75,8 @@ else
     chmod a+r "$ICONFILE"
 fi
 
-echo "Registering everest scheme handler"
-xdg-mime default "$DESKTOPFILE" "x-scheme-handler/everest"
+# echo "Registering  scheme handler"
+# xdg-mime default "$DESKTOPFILE" "x-scheme-handler/everest"
 echo "Updating desktop database"
 update-desktop-database "$APPSDIR"
 

@@ -19,8 +19,9 @@ function modinstaller.register()
         if (exepath:match(".exe$") and
             registry.setKey([[HKCU\Software\Classes\Everest\]], "URL:Everest") and
             registry.setKey([[HKCU\Software\Classes\Everest\URL Protocol]], "") and
-            registry.setKey([[HKCU\Software\Classes\Everest\shell\open\command\]], string.format([["%s" "%%1"]], exepath)))
-            then
+            registry.setKey([[HKCU\Software\Classes\Everest\shell\open\command\]], string.format([["%s" "%%1"]], exepath))
+            )
+        then
 
             -- While we're here, might as well register the application properly.
             print("updating installed application listing")
@@ -40,26 +41,27 @@ function modinstaller.register()
         return false
 
     elseif userOS == "Linux" then
-        -- While we're here, might as well check if the everest scheme handler is registered.
-        local p = io.popen([["xdg-mime" "query" "default" "x-scheme-handler/everest"]])
-        local data = utils.trim(p:read("*a")) or ""
-        if p:close() and data == "" then
-            alert([[
-Olympus isn't fully installed.
-Please run install.sh to install the one-click installer handler.
-install.sh can be found in your Olympus installation folder.]])
-        end
+        -- -- While we're here, might as well check if the everest scheme handler is registered.
+        -- local p = io.popen([["xdg-mime" "query" "default" "x-scheme-handler/ccmodmanager"]])
+        -- local data = utils.trim(p:read("*a")) or ""
+        -- if p:close() and data == "" then
+        --     --             alert([[
+        --     -- Olympus isn't fully installed.
+        --     -- Please run install.sh to install the one-click installer handler.
+        --     -- install.sh can be found in your Olympus installation folder.]])
+        -- end
 
         return false
     end
 end
 
-
 function modinstaller.install(modurl, cb)
     local install = config.installs[config.install]
     install = install and install.path
 
-    modurl = modurl and modurl:match("^(https://gamebanana.com/mmdl/.*),.*,.*$") or modurl
+    modurl = modurl and
+        modurl:match("https://github.com/.*?/.*?/archive/.*|https://github.com/.*?/.*?/releases/download/.*?/.*") or
+        modurl
 
     if not install or not modurl then
         return
@@ -102,6 +104,5 @@ function modinstaller.install(modurl, cb)
     end)
 
 end
-
 
 return modinstaller

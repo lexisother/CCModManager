@@ -44,8 +44,11 @@ RUN chmod +x serve
 # Setup: install dotnet and friends
 RUN apt -y install gnupg ca-certificates dotnet6
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
-RUN echo "deb https://download.mono-project.com/repo/ubuntu stable-bionic main" | tee /etc/apt/sources.list.d/mono-official-stable.list
-RUN apt -y update && apt -y install mono-roslyn mono-complete mono-dbg msbuild
+# RUN echo "deb https://download.mono-project.com/repo/ubuntu stable-bionic main" | tee /etc/apt/sources.list.d/mono-official-stable.list
+# RUN apt -y update && apt -y install mono-roslyn mono-complete mono-dbg msbuild
+RUN wget https://dot.net/v1/dotnet-install.sh
+RUN chmod +x ./dotnet-install.sh
+RUN ./dotnet-install.sh -c 6.0
 
 # Setup: install luarocks and deps
 RUN apt -y update && apt -y install \

@@ -1,30 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>exe</OutputType>
-    <TargetFramework>net6</TargetFramework>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <RootNamespace>CCModManager</RootNamespace>
-    <ApplicationIcon />
-    <StartupObject />
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AssemblyName>CCModManager.Sharp</AssemblyName>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>exe</OutputType>
+        <TargetFramework>net6</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <RootNamespace>CCModManager</RootNamespace>
+        <ApplicationIcon/>
+        <StartupObject/>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <AssemblyName>CCModManager.Sharp</AssemblyName>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <!--<PackageReference Include="Mono.Cecil" Version="0.11.4" />
-    <PackageReference Include="MonoMod" Version="22.01.04.03" />
-    <PackageReference Include="MonoMod.RuntimeDetour" Version="22.01.04.03" />
-    <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="22.01.04.03" />
-    <PackageReference Include="MonoMod.Utils" Version="22.01.04.03" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />-->
-    <PackageReference Include="YamlDotNet" Version="9.1.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <!--<PackageReference Include="Mono.Cecil" Version="0.11.4" />
+        <PackageReference Include="MonoMod" Version="22.01.04.03" />
+        <PackageReference Include="MonoMod.RuntimeDetour" Version="22.01.04.03" />
+        <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="22.01.04.03" />
+        <PackageReference Include="MonoMod.Utils" Version="22.01.04.03" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />-->
+        <PackageReference Include="YamlDotNet" Version="9.1.0"/>
+    </ItemGroup>
 
-  <!--<ItemGroup>
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Windows.Forms" />
-  </ItemGroup>-->
+    <!--<ItemGroup>
+      <Reference Include="System.IO.Compression" />
+      <Reference Include="System.Windows.Forms" />
+    </ItemGroup>-->
 
 </Project>
