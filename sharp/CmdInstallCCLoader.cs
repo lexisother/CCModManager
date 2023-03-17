@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.IO;
 using System.IO.Compression;
 
@@ -26,6 +27,10 @@ public unsafe partial class CmdInstallCCLoader : Cmd<string, string, string, IEn
 		//             yield return Unpack(zip, root);
 		//     }
 		// }
+
+		Console.Error.WriteLine($"Root to install to: {root}");
+		Console.Error.WriteLine($"File we're downloading: ${artifactBase}");
+		Console.Error.WriteLine($"We are installing CCLoader 3: ${artifactBase.Contains("CCLoader3")}");
 
 		if (!Directory.Exists(PathOrig))
 		{
