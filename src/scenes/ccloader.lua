@@ -420,7 +420,24 @@ function scene.load()
 			end
 
 			release.version = version
-			release.buildURL = release.zipball_url
+
+			-- We need some special handling for CCLoader3 as it ships through
+			-- distributable zips instead of a zip of the repository contents.
+			if version:find('v3') then
+				utils.printd('[debug:ccloader:load] Found a CCLoader3 release! Kicking off special handling...')
+				local url
+				for _,a in pairs(release.assets) do
+					utils.printd('[debug:ccloader:find] Currently parsing release asset:', utils.dumpTable(a))
+					if a.browser_download_url:find("ccloader_" .. version .. "_quick-install.zip", nil, true) then
+						utils.printd('[debug:ccloader:find] Found a quick-install asset that matches the current version!')
+						url = a.browser_download_url
+					end
+				end
+				release.buildURL = url
+				utils.printd('[debug:ccloader:find] Set buildURL to', url)
+			else
+				release.buildURL = release.zipball_url
+			end
 
 			local pin = false
 
