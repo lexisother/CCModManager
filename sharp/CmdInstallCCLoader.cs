@@ -39,30 +39,51 @@ public class CmdInstallCCLoader : Cmd<string, string, string, IEnumerator>
             Directory.CreateDirectory(PathOrig);
         }
 
+        // TODO: Currently, when going from CCLoader3 -> CCLoader2 ->
+        // CCLoader3, an error occurs because it tries to move CCLoader3's mods
+        // into the directory that already exists. The task at hand: make sure
+        // the backed up mods directory is moved back into place when switching
+        // from a major modloader version. Take into account CCLoader2's
+        // default mods `crosscode-version-display` and `simplify`. They need
+        // not be backed up, as they are potentially updated when a new zipball
+        // of CCLoader2 is downloaded.
         if (is3 && File.Exists(Path.Combine(root, "ccloader", "package.json")))
         {
             yield return Status("CCLoader2 found!", false, "backup", false);
             var from = Path.Combine(root, "assets", "mods");
-            var to = Path.Combine(PathOrig, "ccloader2-mods", Path.GetFileName(from));
+            var to = Path.Combine(PathOrig, "ccloader2-mods");
             if (!Directory.Exists(from))
             {
-                yield return Status("Somehow, CCLoader is installed, but the mods directory is not present.", 1f,
+                yield return Status("Somehow, CCLoader2 is installed, but the mods directory is not present.", 1f,
                     "error", false);
-                throw new Exception("CCLoader found, but no mods dir exists!");
+                throw new Exception("CCLoader2 found, but no mods dir exists!");
             }
 
             yield return Status($"Moving mods directory {from} => {to}", false, "backup", false);
-            Directory.CreateDirectory(Path.Combine(PathOrig, "ccloader2-mods"));
             Directory.Move(from, to);
 
             yield return Status("Removing CCLoader2", false, "backup", false);
             Directory.Delete(Path.Combine(root, "ccloader"), true);
         }
 
-        // if (!is3 && File.Exists(Path.Combine(root, "ccloader", "metadata.json")))
-        // {
-        // 	yield return Status("CCLoader3 was found!", false, "backup", false);
-        // }
+        if (!is3 && File.Exists(Path.Combine(root, "ccloader", "metadata.json")))
+        {
+            yield return Status("CCLoader3 was found!", false, "backup", false);
+            var from = Path.Combine(root, "assets", "mods");
+            var to = Path.Combine(PathOrig, "ccloader3-mods");
+            if (!Directory.Exists(from))
+            {
+                yield return Status("Somehow, CCLoader3 is installed, but the mods directory is not present.", 1f,
+                    "error", false);
+                throw new Exception("CCLoader3 found, but no mods dir exists!");
+            }
+
+            yield return Status($"Moving mods directory {from} => {to}", false, "backup", false);
+            Directory.Move(from, to);
+
+            yield return Status("Removing CCLoader3", false, "backup", false);
+            Directory.Delete(Path.Combine(root, "ccloader"), true);
+        }
 
 
         var toBackup = new[] { "package.json" };
