@@ -1,5 +1,6 @@
 local ui, uiu, uie = require("ui").quick()
 local scener = require("scener")
+local fs = require("fs")
 local utils = require("utils")
 local alert = require("alert")
 local threader = require("threader")
@@ -124,10 +125,10 @@ Use the latest ]],
 						force = true,
 						body = [[
 	Uninstalling CCLoader will keep all your mods intact,
-	unless you manually delete them, or fully reinstall CrossCode,
+	unless you manually delete them, or fully reinstall CrossCode.
 
 	If even uninstalling CCLoader doesn't bring the expected result,
-	please go to your game manager's library and let if verify the game's files.
+	please go to your game manager's library and let it verify the game's files.
 	Steam and the itch.io app let you do that without a full reinstall.]],
 						buttons = {
 							{
@@ -286,7 +287,9 @@ function scene.load()
 	threader.routine(function()
 		local utilsAsync = threader.wrap("utils")
 		local releasesTask = utilsAsync.downloadJSON("https://api.github.com/repos/CCDirectLink/CCLoader/releases")
-		local tagsTask = utilsAsync.downloadJSON("https://api.github.com/repos/CCDirectlink/CCLoader/tags")
+		local tagsTask = utilsAsync.downloadJSON("https://api.github.com/repos/CCDirectLink/CCLoader/tags")
+		local releases3Task = utilsAsync.downloadJSON("https://api.github.com/repos/CCDirectLink/CCLoader3/releases")
+		local tags3Task = utilsAsync.downloadJSON("https://api.github.com/repos/CCDirectLink/CCLoader3/tags")
 		-- local commitsTask = utilsAsync.downloadJSON("https://api.github.com/repos/CCDirectLink/CCLoader/commits")
 
 		local list = root:findChild("versions")
@@ -298,7 +301,25 @@ function scene.load()
 			root:findChild("loadingVersions"):removeSelf()
 			root:findChild("versionsParent"):addChild(uie.paneled
 				.row({
-					uie.label("Error downloading builds list: " .. tostring(releasesError)),
+					uie.label("Error downloading CCLoader release list: " .. tostring(releasesError)),
+				})
+				:with({
+					clip = false,
+					cacheable = false,
+				})
+				:with(uiu.bottombound)
+				:with(uiu.rightbound)
+				:as("error"))
+			list:addChild(manualItem)
+			return
+		end
+
+		local releases3, releases3Error = releases3Task:result()
+		if not releases3 then
+			root:findChild("loadingVersions"):removeSelf()
+			root:findChild("versionsParent"):addChild(uie.paneled
+				.row({
+					uie.label("Error downloading CCLoader3 release list: " .. tostring(releases3Error)),
 				})
 				:with({
 					clip = false,
@@ -316,7 +337,7 @@ function scene.load()
 			root:findChild("loadingVersions"):removeSelf()
 			root:findChild("versionsParent"):addChild(uie.paneled
 				.row({
-					uie.label("Error downloading tags list: " .. tostring(tagsError)),
+					uie.label("Error downloading CCLoader tags list: " .. tostring(tagsError)),
 				})
 				:with({
 					clip = false,
@@ -328,6 +349,33 @@ function scene.load()
 			list:addChild(manualItem)
 			return
 		end
+
+		local tags3, tags3Error = tags3Task:result()
+		if not tags3 then
+			root:findChild("loadingVersions"):removeSelf()
+			root:findChild("versionsParent"):addChild(uie.paneled
+				.row({
+					uie.label("Error downloading CCLoader3 tags list: " .. tostring(tags3Error)),
+				})
+				:with({
+					clip = false,
+					cacheable = false,
+				})
+				:with(uiu.bottombound)
+				:with(uiu.rightbound)
+				:as("error"))
+			list:addChild(manualItem)
+			return
+		end
+
+		for k,v in pairs(releases3) do
+			table.insert(releases, 1, v)
+		end
+		for k,v in pairs(tags3) do
+			table.insert(tags, 1, v)
+		end
+		table.sort(releases, function(a, b) return a.tag_name > b.tag_name end)
+		table.sort(tags, function(a, b) return a.name > b.name end)
 
 		-- local commits, commitsError = commitsTask:result()
 		-- if not commits then
