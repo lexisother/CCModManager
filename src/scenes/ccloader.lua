@@ -285,11 +285,17 @@ end
 
 function scene.load()
 	threader.routine(function()
+		local isDebug = os.getenv("GITHUB_TOKEN") ~= nil
+		local headers = {
+			["User-Agent"] = "curl/7.64.1",
+			["Accept"] = "*/*"
+		}
+		if isDebug then headers["Authorization"] = "Bearer " .. os.getenv("GITHUB_TOKEN") end
 		local utilsAsync = threader.wrap("utils")
-		local releasesTask = utilsAsync.downloadJSON("https://api.github.com/repos/CCDirectLink/CCLoader/releases")
-		local tagsTask = utilsAsync.downloadJSON("https://api.github.com/repos/CCDirectLink/CCLoader/tags")
-		local releases3Task = utilsAsync.downloadJSON("https://api.github.com/repos/CCDirectLink/CCLoader3/releases")
-		local tags3Task = utilsAsync.downloadJSON("https://api.github.com/repos/CCDirectLink/CCLoader3/tags")
+		local releasesTask = utilsAsync.downloadJSON("https://api.github.com/repos/CCDirectLink/CCLoader/releases", headers)
+		local tagsTask = utilsAsync.downloadJSON("https://api.github.com/repos/CCDirectLink/CCLoader/tags", headers)
+		local releases3Task = utilsAsync.downloadJSON("https://api.github.com/repos/CCDirectLink/CCLoader3/releases", headers)
+		local tags3Task = utilsAsync.downloadJSON("https://api.github.com/repos/CCDirectLink/CCLoader3/tags", headers)
 		-- local commitsTask = utilsAsync.downloadJSON("https://api.github.com/repos/CCDirectLink/CCLoader/commits")
 
 		local list = root:findChild("versions")

@@ -7,7 +7,7 @@ local config = require("config")
 local scener = require("scener")
 
 local scene = {
-	name = "Alyxia's Testing Grounds",
+	name = "CCModManager",
 }
 
 local function checkInstall(forceInstall)
